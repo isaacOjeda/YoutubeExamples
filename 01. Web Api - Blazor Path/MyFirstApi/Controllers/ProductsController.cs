@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using MyFirstApi.Data;
 using MyFirstApi.Dto.Products;
 using MyFirstApi.Models;
@@ -32,7 +33,9 @@ namespace MyFirstApi.Controllers
                     Description = s.Description,
                     Name = s.Name,
                     Price = s.Price,
-                    ProductId = s.ProductId                
+                    ProductId = s.ProductId,
+                    CategoryId = s.CategoryId,
+                    CategoryName = s.Category.Name
                 })
                 .ToList();
         }
@@ -43,20 +46,24 @@ namespace MyFirstApi.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetProduct(int productId)
         {
-            var product = await _context.Products.FindAsync(productId);
+            var product = await _context.Products
+                .Select(product => new ProductModel
+                {
+                    Description = product.Description,
+                    Name = product.Name,
+                    Price = product.Price,
+                    ProductId = product.ProductId,
+                    CategoryId = product.CategoryId,
+                    CategoryName = product.Category.Name
+                })
+                .FirstOrDefaultAsync(q => q.ProductId == productId);
 
             if (product is null)
             {
                 return NotFound();
             }
 
-            return Ok(new ProductModel
-            {
-                Description = product.Description,
-                Name = product.Name,
-                Price = product.Price,
-                ProductId = product.ProductId
-            });
+            return Ok(product);
         }
 
         [HttpPost]
@@ -73,7 +80,8 @@ namespace MyFirstApi.Controllers
             {
                 Description = model.Description,
                 Name = model.Name,
-                Price = model.Price.Value
+                Price = model.Price.Value,
+                CategoryId = model.CategoryId.Value
             };
 
             _context.Products.Add(newProduct);
@@ -109,6 +117,11 @@ namespace MyFirstApi.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UpdateProduct(int productId, [FromBody] ProductModel model)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var product = await _context.Products.FindAsync(productId);
 
             if (product is null)
@@ -119,6 +132,7 @@ namespace MyFirstApi.Controllers
             product.Name = model.Name;
             product.Description = model.Description;
             product.Price = model.Price.Value;
+            product.CategoryId = model.CategoryId.Value;
 
             await _context.SaveChangesAsync();
 

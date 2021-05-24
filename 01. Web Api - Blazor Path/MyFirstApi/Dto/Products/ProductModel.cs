@@ -10,5 +10,8 @@ namespace MyFirstApi.Dto.Products
         public string Description { get; set; }
         [Required]        
         public double? Price { get; set; }
+        [Required]
+        public int? CategoryId { get; set; }
+        public string CategoryName { get; set; }
     }
 }

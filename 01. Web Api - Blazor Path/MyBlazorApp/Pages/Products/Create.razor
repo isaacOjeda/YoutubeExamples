@@ -4,6 +4,7 @@
 @using MyBlazorApp.ViewModel.Products
 
 @inject ProductsClient ProductsClient
+@inject CategoryClient CategoryClient
 @inject NavigationManager NavManager
 
 <h1>New Product</h1>
@@ -30,6 +31,18 @@
             <InputTextArea class="form-control" @bind-Value="viewModel.Description" />
         </div>
     </div>
+    <!-- Category -->
+    <div class="form-group row">
+        <label class="col-form-label col-md-2">Category</label>
+        <div class="col-md-4">
+            <InputSelect class="form-control" @bind-Value="viewModel.CategoryId">
+                @foreach (var category in _categories)
+                {
+                    <option value="@category.CategoryID">@category.Name</option>
+                }            
+            </InputSelect>
+        </div>
+    </div>
     <!-- Price -->
     <div class="form-group row">
         <label class="col-form-label col-2">Price</label>
@@ -51,6 +64,12 @@
 
 @code {
     private CreateProductsViewModel viewModel = new();
+    private ICollection<CategoryDto> _categories = new List<CategoryDto>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _categories = await CategoryClient.GetCategoriesAsync();
+    }
 
     private async Task OnSubmit()
     {
@@ -58,7 +77,8 @@
         {
             Description = viewModel.Description,
             Name = viewModel.Name,
-            Price = viewModel.Price
+            Price = viewModel.Price,
+            CategoryId = viewModel.CategoryId
         };
 
         await ProductsClient.CreateProductAsync(productDto);

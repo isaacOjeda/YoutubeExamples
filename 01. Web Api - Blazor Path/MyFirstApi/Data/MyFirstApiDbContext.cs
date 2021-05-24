@@ -11,6 +11,7 @@ namespace MyFirstApi.Data
 
         }
         public DbSet<Product> Products { get; set; }
+        public DbSet<Category> Categories { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -23,7 +24,21 @@ namespace MyFirstApi.Data
 
                 config.Property(q => q.Name)
                     .HasMaxLength(500)
-                    .IsRequired();
+                    .IsRequired();                
+            });
+
+            modelBuilder.Entity<Category>(config =>
+            {
+                config.HasKey(q => q.CategoryId);
+
+                config.Property(q => q.Name)
+                    .IsRequired()
+                    .HasMaxLength(500);
+
+                config.HasMany(q => q.Products)
+                    .WithOne(q => q.Category)
+                    .HasForeignKey(q => q.CategoryId)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
 
             base.OnModelCreating(modelBuilder);

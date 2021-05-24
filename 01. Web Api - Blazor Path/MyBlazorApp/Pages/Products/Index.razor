@@ -21,6 +21,7 @@ else
             <tr>
                 <th>Name</th>
                 <th>Description</th>
+                <th>Category</th>
                 <th>Price</th>
                 <th></th>
             </tr>
@@ -31,6 +32,7 @@ else
                 <tr>
                     <td>@product.Name</td>
                     <td>@product.Description</td>
+                    <td>@product.CategoryName</td>
                     <td>@product.Price.ToString("c")</td>
                     <td>
                         <NavLink class="btn btn-sm btn-light" href="@($"/products/edit/{product.ProductId}")">
