@@ -50,6 +50,8 @@ namespace MyFirstApi
                     );
                 });
 
+            services.AddHttpContextAccessor();
+
             services.AddControllers();
         }
 
@@ -67,6 +69,7 @@ namespace MyFirstApi
                 });
 
             app.UseCors("MyFirstApiCors");
+            app.UseStaticFiles();
             app.UseRouting();
             app.UseEndpoints(endpoints =>
             {

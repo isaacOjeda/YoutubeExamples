@@ -39,7 +39,7 @@
                 @foreach (var category in _categories)
                 {
                     <option value="@category.CategoryID">@category.Name</option>
-                }            
+                }
             </InputSelect>
         </div>
     </div>
@@ -48,6 +48,13 @@
         <label class="col-form-label col-2">Price</label>
         <div class="col-md-4">
             <InputNumber class="form-control" @bind-Value="viewModel.Price" />
+        </div>
+    </div>
+    <!-- File -->
+    <div class="form-group row">
+        <label class="col-form-label col-2">Photo</label>
+        <div class="col-md-4">
+            <InputFile OnChange="@OnFileChange" multiple="false" accept="images/jpeg"/>
         </div>
     </div>
     <!-- Submit -->
@@ -65,23 +72,29 @@
 @code {
     private CreateProductsViewModel viewModel = new();
     private ICollection<CategoryDto> _categories = new List<CategoryDto>();
+    private IBrowserFile file;
 
     protected override async Task OnInitializedAsync()
     {
         _categories = await CategoryClient.GetCategoriesAsync();
     }
 
+    private void OnFileChange(InputFileChangeEventArgs ev)
+    {
+        if (ev.File is not null)
+        {
+            file = ev.File;
+        }
+    }
+
     private async Task OnSubmit()
     {
-        var productDto = new ProductModel
-        {
-            Description = viewModel.Description,
-            Name = viewModel.Name,
-            Price = viewModel.Price,
-            CategoryId = viewModel.CategoryId
-        };
+        using var stream = file.OpenReadStream();
 
-        await ProductsClient.CreateProductAsync(productDto);
+        var fileParameter = new FileParameter(stream, file.Name, file.ContentType);
+
+        await ProductsClient
+            .CreateProductAsync(0, viewModel.Name, viewModel.Description, viewModel.Price, viewModel.CategoryId, null, fileParameter);
 
         NavManager.NavigateTo("/products");
     }

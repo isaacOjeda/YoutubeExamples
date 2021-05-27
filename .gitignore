@@ -348,3 +348,4 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+/01. Web Api - Blazor Path/MyFirstApi/wwwroot/Images

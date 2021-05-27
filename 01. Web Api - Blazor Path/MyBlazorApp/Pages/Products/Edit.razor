@@ -39,7 +39,7 @@
                 @foreach (var category in _categories)
                 {
                     <option value="@category.CategoryID">@category.Name</option>
-                }            
+                }
             </InputSelect>
         </div>
     </div>
@@ -71,30 +71,30 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _categories = await CategoryClient.GetCategoriesAsync();
-        var product = await ProductsClient.GetProductAsync(ProductId);
+        //_categories = await CategoryClient.GetCategoriesAsync();
+        //var product = await ProductsClient.GetProductAsync(ProductId);
 
-        viewModel = new CreateProductsViewModel
-        {
-            Description = product.Description,
-            Name = product.Name,
-            Price = product.Price,
-            CategoryId = product.CategoryId
-        };
+        //viewModel = new CreateProductsViewModel
+        //{
+        //    Description = product.Description,
+        //    Name = product.Name,
+        //    Price = product.Price,
+        //    CategoryId = product.CategoryId
+        //};
     }
 
     private async Task OnSubmit()
     {
-        var product = new ProductModel
-        {
-            Description = viewModel.Description,
-            Name = viewModel.Name,
-            Price = viewModel.Price,
-            CategoryId = viewModel.CategoryId
-        };
+        //var product = new ProductModel
+        //{
+        //    Description = viewModel.Description,
+        //    Name = viewModel.Name,
+        //    Price = viewModel.Price,
+        //    CategoryId = viewModel.CategoryId
+        //};
 
-        await ProductsClient.UpdateProductAsync(ProductId, product);
+        //await ProductsClient.UpdateProductAsync(ProductId, product);
 
-        NavManager.NavigateTo("/products");
+        //NavManager.NavigateTo("/products");
     }
 }

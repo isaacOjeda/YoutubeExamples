@@ -10,9 +10,14 @@
     New Product
 </NavLink>
 
-@if (products.Count == 0)
+
+@if (products is null)
 {
     <p>Cargando productos...</p>
+}
+else if (products.Count == 0)
+{
+    <p>No hay productos registrados...</p>
 }
 else
 {
@@ -33,7 +38,7 @@ else
                     <td>@product.Name</td>
                     <td>@product.Description</td>
                     <td>@product.CategoryName</td>
-                    <td>@product.Price.ToString("c")</td>
+                    <td>@product.Price.GetValueOrDefault().ToString("c")</td>
                     <td>
                         <NavLink class="btn btn-sm btn-light" href="@($"/products/edit/{product.ProductId}")">
                             <span class="oi oi-pencil"></span>
@@ -51,14 +56,14 @@ else
 
 @code {
 
-    private ICollection<ProductModel> products = new List<ProductModel>();
+    private ICollection<ProductDto> products;
 
     protected override async Task OnInitializedAsync()
     {
         products = await ProductsClient.GetProductsAsync();
     }
 
-    private async Task DeleteProduct(ProductModel model)
+    private async Task DeleteProduct(ProductDto model)
     {
         var result = await JS.InvokeAsync<bool>("confirm", $"Are you sure to delete {model.Name}?");
 

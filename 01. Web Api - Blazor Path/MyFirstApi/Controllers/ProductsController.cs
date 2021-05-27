@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,43 +12,48 @@ using MyFirstApi.Models;
 namespace MyFirstApi.Controllers
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     [Route("api/Products")]
     [ApiController]
     public class ProductsController : ControllerBase
     {
         private readonly MyFirstApiDbContext _context;
+        private readonly IWebHostEnvironment _host;
+        private readonly HttpContext _http;
 
-        public ProductsController(MyFirstApiDbContext context)
+        public ProductsController(MyFirstApiDbContext context, IWebHostEnvironment host, IHttpContextAccessor contextAccessor)
         {
             _context = context;
+            _host = host;
+            _http = contextAccessor.HttpContext;
         }
 
         [HttpGet]
-        public List<ProductModel> GetProducts()
+        public List<ProductDto> GetProducts()
         {
             return _context.Products
-                .Select(s => new ProductModel
+                .Select(s => new ProductDto
                 {
                     Description = s.Description,
                     Name = s.Name,
                     Price = s.Price,
                     ProductId = s.ProductId,
                     CategoryId = s.CategoryId,
-                    CategoryName = s.Category.Name
+                    CategoryName = s.Category.Name,
+                    UrlPhoto = $"{_http.Request.Scheme}://{_http.Request.Host}/Images/Product_{s.ProductId}.jpg"
                 })
                 .ToList();
         }
 
         [HttpGet]
         [Route("{productId}")]
-        [ProducesResponseType(typeof(ProductModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProductDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetProduct(int productId)
         {
             var product = await _context.Products
-                .Select(product => new ProductModel
+                .Select(product => new ProductDto
                 {
                     Description = product.Description,
                     Name = product.Name,
@@ -69,7 +75,7 @@ namespace MyFirstApi.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> CreateProduct([FromBody] ProductModel model)
+        public async Task<IActionResult> CreateProduct([FromForm] ProductCreateEditDto model)
         {
             if (!ModelState.IsValid)
             {
@@ -87,6 +93,18 @@ namespace MyFirstApi.Controllers
             _context.Products.Add(newProduct);
 
             await _context.SaveChangesAsync();
+
+
+            // Guardar foto en Storage
+            if (model.Photo is not null)
+            {
+                var extension = System.IO.Path.GetExtension(model.Photo.FileName);
+                var path = $"{_host.WebRootPath}/Images/Product_{newProduct.ProductId}{extension}";
+
+                using var fileStream = System.IO.File.Create(path);
+
+                await model.Photo.CopyToAsync(fileStream);
+            }
 
             return Accepted();
         }
@@ -115,7 +133,7 @@ namespace MyFirstApi.Controllers
         [Route("{productId}")]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> UpdateProduct(int productId, [FromBody] ProductModel model)
+        public async Task<IActionResult> UpdateProduct(int productId, [FromBody] ProductCreateEditDto model)
         {
             if (!ModelState.IsValid)
             {
