@@ -41,7 +41,7 @@ namespace MyFirstApi.Controllers
                     ProductId = s.ProductId,
                     CategoryId = s.CategoryId,
                     CategoryName = s.Category.Name,
-                    UrlPhoto = $"{_http.Request.Scheme}://{_http.Request.Host}/Images/Product_{s.ProductId}.jpg"
+                    UrlPhoto = $"{_http.Request.Scheme}://{_http.Request.Host}/Images/{s.PhotoName}"
                 })
                 .ToList();
         }
@@ -60,7 +60,8 @@ namespace MyFirstApi.Controllers
                     Price = product.Price,
                     ProductId = product.ProductId,
                     CategoryId = product.CategoryId,
-                    CategoryName = product.Category.Name
+                    CategoryName = product.Category.Name,
+                    UrlPhoto = $"{_http.Request.Scheme}://{_http.Request.Host}/Images/{product.PhotoName}"
                 })
                 .FirstOrDefaultAsync(q => q.ProductId == productId);
 
@@ -90,21 +91,24 @@ namespace MyFirstApi.Controllers
                 CategoryId = model.CategoryId.Value
             };
 
-            _context.Products.Add(newProduct);
-
-            await _context.SaveChangesAsync();
-
-
             // Guardar foto en Storage
             if (model.Photo is not null)
             {
+                var fileName = System.IO.Path.GetRandomFileName();
                 var extension = System.IO.Path.GetExtension(model.Photo.FileName);
-                var path = $"{_host.WebRootPath}/Images/Product_{newProduct.ProductId}{extension}";
+
+                newProduct.PhotoName = $"{fileName}{extension}";
+
+                var path = $"{_host.WebRootPath}/Images/{newProduct.PhotoName}";
 
                 using var fileStream = System.IO.File.Create(path);
 
                 await model.Photo.CopyToAsync(fileStream);
             }
+
+            _context.Products.Add(newProduct);
+
+            await _context.SaveChangesAsync();
 
             return Accepted();
         }
@@ -130,17 +134,16 @@ namespace MyFirstApi.Controllers
         }
 
         [HttpPut]
-        [Route("{productId}")]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> UpdateProduct(int productId, [FromBody] ProductCreateEditDto model)
+        public async Task<IActionResult> UpdateProduct([FromForm] ProductCreateEditDto model)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var product = await _context.Products.FindAsync(productId);
+            var product = await _context.Products.FindAsync(model.ProductId);
 
             if (product is null)
             {
@@ -151,6 +154,21 @@ namespace MyFirstApi.Controllers
             product.Description = model.Description;
             product.Price = model.Price.Value;
             product.CategoryId = model.CategoryId.Value;
+
+            // Guardar foto en Storage
+            if (model.Photo is not null)
+            {
+                var fileName = System.IO.Path.GetRandomFileName();
+                var extension = System.IO.Path.GetExtension(model.Photo.FileName);
+
+                product.PhotoName = $"{fileName}{extension}";
+
+                var path = $"{_host.WebRootPath}/Images/{product.PhotoName}";
+
+                using var fileStream = System.IO.File.Create(path);
+
+                await model.Photo.CopyToAsync(fileStream);
+            }
 
             await _context.SaveChangesAsync();
 

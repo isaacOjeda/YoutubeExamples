@@ -50,6 +50,13 @@
             <InputNumber class="form-control" @bind-Value="viewModel.Price" />
         </div>
     </div>
+    <!-- File -->
+    <div class="form-group row">
+        <label class="col-form-label col-2">Photo</label>
+        <div class="col-md-4">
+            <InputFile OnChange="@OnFileChange" multiple="false" accept="images/jpeg"/>
+        </div>
+    </div>
     <!-- Submit -->
     <div class="form-group row">
         <div class="col-md-10 ml-auto">
@@ -66,35 +73,40 @@
     public int ProductId { get; set; }
 
     private CreateProductsViewModel viewModel = new();
-
     private ICollection<CategoryDto> _categories = new List<CategoryDto>();
+    private IBrowserFile file;
 
     protected override async Task OnInitializedAsync()
     {
-        //_categories = await CategoryClient.GetCategoriesAsync();
-        //var product = await ProductsClient.GetProductAsync(ProductId);
+        _categories = await CategoryClient.GetCategoriesAsync();
+        var product = await ProductsClient.GetProductAsync(ProductId);
 
-        //viewModel = new CreateProductsViewModel
-        //{
-        //    Description = product.Description,
-        //    Name = product.Name,
-        //    Price = product.Price,
-        //    CategoryId = product.CategoryId
-        //};
+        viewModel = new CreateProductsViewModel
+        {
+            Description = product.Description,
+            Name = product.Name,
+            Price = product.Price.Value,
+            CategoryId = product.CategoryId.Value            
+        };
+    }
+
+    private void OnFileChange(InputFileChangeEventArgs ev)
+    {
+        if (ev.File is not null)
+        {
+            file = ev.File;
+        }
     }
 
     private async Task OnSubmit()
     {
-        //var product = new ProductModel
-        //{
-        //    Description = viewModel.Description,
-        //    Name = viewModel.Name,
-        //    Price = viewModel.Price,
-        //    CategoryId = viewModel.CategoryId
-        //};
+        using var stream = file.OpenReadStream();
 
-        //await ProductsClient.UpdateProductAsync(ProductId, product);
+        var fileParameter = new FileParameter(stream, file.Name, file.ContentType);
 
-        //NavManager.NavigateTo("/products");
+        await ProductsClient
+            .UpdateProductAsync(ProductId,viewModel.Name, viewModel.Description, viewModel.Price, viewModel.CategoryId, null, fileParameter);
+
+        NavManager.NavigateTo("/products");
     }
 }
