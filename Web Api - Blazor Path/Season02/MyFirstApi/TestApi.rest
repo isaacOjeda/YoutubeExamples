@@ -1,0 +1,30 @@
+@apiHost = http://localhost:5000
+
+### Get Products
+GET {{apiHost}}/api/Products
+
+### Get Product by ID
+GET {{apiHost}}/api/Products/5
+
+### Create Product
+POST {{apiHost}}/api/Products
+Content-Type: application/json
+
+{
+    "name": "iPhone x",
+    "price": 26000,
+    "description": "Celular iPhone bla bla bla 2 2 2"
+}
+
+### Delete Product
+DELETE {{apiHost}}/api/Products/3
+
+### Update Product
+PUT {{apiHost}}/api/Products/5
+Content-Type: application/json
+
+{
+    "name": "Generic Android Phone",
+    "price": 2000,
+    "description": "Random description here... bla bla bla x2"
+}
