@@ -69,8 +69,10 @@ namespace MyFirstApi
 
             services.AddHttpContextAccessor();
             services.AddAuthentication();
-
             services.AddControllers();
+
+            // My Services
+            services.AddTransient<MyFirstApiDbContextSeed>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
