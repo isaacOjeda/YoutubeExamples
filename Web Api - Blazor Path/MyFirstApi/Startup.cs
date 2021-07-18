@@ -12,6 +12,9 @@ using MyFirstApi.Data;
 using Microsoft.Extensions.Configuration;
 using MyFirstApi.Models;
 using Microsoft.AspNetCore.Identity;
+using MyFirstApi.Helpers;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace MyFirstApi
 {
@@ -68,7 +71,24 @@ namespace MyFirstApi
                 });
 
             services.AddHttpContextAccessor();
-            services.AddAuthentication();
+            services.AddAuthentication(AppConstants.JwtScheme)
+                .AddJwtBearer(AppConstants.JwtScheme, options =>
+                {
+                    var securityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Configuration["Jwt:SecretKey"]));
+
+                    options.RequireHttpsMetadata = false;
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidIssuer = "myApi/issuer",
+                        ValidAudience = "myApi/audience",
+                        IssuerSigningKey = securityKey,
+                        ClockSkew = TimeSpan.Zero
+                    };
+                });
             services.AddControllers();
 
             // My Services
@@ -91,6 +111,10 @@ namespace MyFirstApi
             app.UseCors("MyFirstApiCors");
             app.UseStaticFiles();
             app.UseRouting();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
