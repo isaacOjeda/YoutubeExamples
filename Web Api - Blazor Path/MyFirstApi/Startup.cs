@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Identity;
 using MyFirstApi.Helpers;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using NSwag;
 
 namespace MyFirstApi
 {
@@ -59,6 +60,13 @@ namespace MyFirstApi
             services.AddOpenApiDocument(configure =>
             {
                 configure.Title = "My First API";
+                configure.AddSecurity("JWT", Enumerable.Empty<string>(), new OpenApiSecurityScheme
+                {
+                    Type = OpenApiSecuritySchemeType.ApiKey,
+                    Name = "Authorization",
+                    In = OpenApiSecurityApiKeyLocation.Header,
+                    Description = "Type into the textbox: Bearer {your JWT token}."
+                });
             });
             services.AddCors(options =>
                 {
@@ -83,8 +91,8 @@ namespace MyFirstApi
                         ValidateIssuer = true,
                         ValidateAudience = true,
                         ValidateLifetime = true,
-                        ValidIssuer = "myApi/issuer",
-                        ValidAudience = "myApi/audience",
+                        ValidIssuer = AppConstants.Issuer,
+                        ValidAudience = AppConstants.Audience,
                         IssuerSigningKey = securityKey,
                         ClockSkew = TimeSpan.Zero
                     };

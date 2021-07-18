@@ -8,10 +8,7 @@ using MyFirstApi.Dto.Categories;
 
 namespace MyFirstApi.Controllers
 {
-
-    [Route("api/Category")]
-    [ApiController]
-    public class CategoryController : ControllerBase
+    public class CategoryController : ApiController
     {
         private readonly MyFirstApiDbContext _context;
 

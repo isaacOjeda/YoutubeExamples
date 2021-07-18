@@ -6,14 +6,13 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyFirstApi.Dto.Users;
+using MyFirstApi.Helpers;
 using MyFirstApi.Models;
 
 namespace MyFirstApi.Controllers
 {
-    [ApiController]
     [Authorize]
-    [Route("api/users")]
-    public class UsersController : ControllerBase
+    public class UsersController : ApiController
     {
         private readonly UserManager<User> _userManager;
 
@@ -32,5 +31,14 @@ namespace MyFirstApi.Controllers
                 LastName = s.LastName
             })
             .ToListAsync();
+
+        [HttpGet("me")]
+        public IActionResult Me() =>
+            Ok(new 
+            {
+                Id = User.GetUserId(),
+                Email = User.GetUserEmail(),
+                User.Identity.Name                
+            });
     }
 }

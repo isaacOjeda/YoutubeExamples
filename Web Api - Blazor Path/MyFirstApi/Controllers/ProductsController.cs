@@ -14,9 +14,7 @@ namespace MyFirstApi.Controllers
     /// <summary>
     ///
     /// </summary>
-    [Route("api/Products")]
-    [ApiController]
-    public class ProductsController : ControllerBase
+    public class ProductsController : ApiController
     {
         private readonly MyFirstApiDbContext _context;
         private readonly IWebHostEnvironment _host;
