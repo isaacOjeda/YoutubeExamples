@@ -7,11 +7,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MyFirstApi.Data;
 
-namespace MyFirstApi.Migrations
+namespace MyFirstApi.Data.Migrations
 {
     [DbContext(typeof(MyFirstApiDbContext))]
-    [Migration("20210524172937_AddedCategory")]
-    partial class AddedCategory
+    [Migration("20210603172622_AddedPhotoName")]
+    partial class AddedPhotoName
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -56,6 +56,9 @@ namespace MyFirstApi.Migrations
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("PhotoName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<double>("Price")
                         .HasColumnType("float");

@@ -10,6 +10,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 using MyFirstApi.Data;
 using Microsoft.Extensions.Configuration;
+using MyFirstApi.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace MyFirstApi
 {
@@ -35,11 +37,26 @@ namespace MyFirstApi
                 }
             });
 
+            services.AddIdentityCore<User>(options =>
+            {
+                // Identity configuration
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequiredLength = 6;
+                options.Password.RequiredUniqueChars = 1;
+
+                options.User.RequireUniqueEmail = true;
+            })
+            .AddRoles<Role>()
+            .AddEntityFrameworkStores<MyFirstApiDbContext>()
+            .AddDefaultTokenProviders();
+
             services.AddOpenApiDocument(configure =>
             {
                 configure.Title = "My First API";
             });
-
             services.AddCors(options =>
                 {
                     options.AddPolicy("MyFirstApiCors", builder => builder
@@ -51,6 +68,7 @@ namespace MyFirstApi
                 });
 
             services.AddHttpContextAccessor();
+            services.AddAuthentication();
 
             services.AddControllers();
         }

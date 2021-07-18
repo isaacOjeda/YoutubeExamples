@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using MyFirstApi.Models;
 
+
 namespace MyFirstApi.Data
 {
-    public class MyFirstApiDbContext : DbContext
+    public class MyFirstApiDbContext : IdentityDbContext<User, Role, string>
     {
         public MyFirstApiDbContext(DbContextOptions<MyFirstApiDbContext> options)
             : base(options)

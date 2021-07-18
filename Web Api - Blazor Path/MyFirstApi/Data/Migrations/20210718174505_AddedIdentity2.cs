@@ -1,14 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace MyFirstApi.Migrations
+namespace MyFirstApi.Data.Migrations
 {
-    public partial class AddedPhotoName : Migration
+    public partial class AddedIdentity2 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
-                name: "PhotoName",
-                table: "Products",
+                name: "Description",
+                table: "AspNetRoles",
                 type: "nvarchar(max)",
                 nullable: true);
         }
@@ -16,8 +16,8 @@ namespace MyFirstApi.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "PhotoName",
-                table: "Products");
+                name: "Description",
+                table: "AspNetRoles");
         }
     }
 }
