@@ -1,0 +1,18 @@
+@host = https://localhost:7116/api/products
+
+### Get Products
+GET {{host}}
+Content-Type: application/json
+
+### Get Product By ID
+GET {{host}}/1
+Content-Type: application/json
+
+### Create Product
+POST {{host}}
+Content-Type: application/json
+
+{
+    "name": "Product 1",
+    "price": 123456
+}
