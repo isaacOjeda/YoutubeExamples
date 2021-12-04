@@ -25,14 +25,24 @@ public class Product : IHasDomainEvent
 
     public void UpdateInfo(UpdateProduct.UpdateProductCommand command)
     {
-        if (Price != command.Price)
-        {
-            DomainEvents.Add(new ProductUpdatePriceEvent(this));
-        }
-
         Name = command.Name!;
         Description = command.Description!;
         Price = command.Price;
         CategoryId = command.CategoryId;
+    }
+
+    public void UpdatePrice(double price)
+    {
+        if (price <= 0)
+        {
+            // TODO: return Error
+        }
+
+        if (Price != price)
+        {
+            DomainEvents.Add(new ProductUpdatePriceEvent(this));
+        }
+
+        Price = price;
     }
 }

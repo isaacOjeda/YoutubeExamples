@@ -125,6 +125,35 @@
         }
       }
     },
+    "/api/products/price": {
+      "put": {
+        "tags": [
+          "Product"
+        ],
+        "operationId": "UpdatePrice",
+        "requestBody": {
+          "x-name": "UpdatePriceCommand",
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePriceCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "202": {
+            "description": ""
+          },
+          "404": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/api/categories": {
       "get": {
         "tags": [
@@ -244,6 +273,20 @@
           "categoryId": {
             "type": "integer",
             "format": "int32"
+          }
+        }
+      },
+      "UpdatePriceCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "productId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "price": {
+            "type": "number",
+            "format": "double"
           }
         }
       },

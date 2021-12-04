@@ -13,7 +13,8 @@ public class ApiDbContext : DbContext
     private readonly ILogger<ApiDbContext> _logger;
     private IDbContextTransaction? _currentTransaction;
 
-    public ApiDbContext(DbContextOptions<ApiDbContext> options, IPublisher publisher, ILogger<ApiDbContext> logger) : base(options)
+    public ApiDbContext(DbContextOptions<ApiDbContext> options, IPublisher publisher, ILogger<ApiDbContext> logger)
+        : base(options)
     {
         _publisher = publisher;
         _logger = logger;
@@ -23,6 +24,7 @@ public class ApiDbContext : DbContext
 
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<Product> Products => Set<Product>();
+
     public async Task BeginTransactionAsync()
     {
         if (_currentTransaction is not null)

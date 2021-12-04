@@ -76,6 +76,8 @@ public class TestBase
         };
 
         await checkpoint.Reset(ApiWebApplication.TestConnectionString);
+
+        // (optional) Seed Database
     }
 
 }

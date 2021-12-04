@@ -14,7 +14,7 @@ public class CreateProduct : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPost("api/products", async (HttpRequest req, IMediator mediator, CreateProductCommand command) =>
+        app.MapPost("api/products", async (IMediator mediator, CreateProductCommand command) =>
         {
             return await mediator.Send(command);
         })
